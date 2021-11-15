@@ -37,18 +37,21 @@ static void RegisterURL(const char* applicationId)
 
     NSString* myBundleId = [[NSBundle mainBundle] bundleIdentifier];
     if (!myBundleId) {
+        if (cfURL) CFRelease(cfURL);
         fprintf(stderr, "No bundle id found\n");
         return;
     }
 
     NSURL* myURL = [[NSBundle mainBundle] bundleURL];
     if (!myURL) {
+        if (cfURL) CFRelease(cfURL);
         fprintf(stderr, "No bundle url found\n");
         return;
     }
 
     OSStatus status = LSSetDefaultHandlerForURLScheme(cfURL, (__bridge CFStringRef)myBundleId);
     if (status != noErr) {
+        if (cfURL) CFRelease(cfURL);
         fprintf(stderr, "Error in LSSetDefaultHandlerForURLScheme: %d\n", (int)status);
         return;
     }
@@ -57,6 +60,8 @@ static void RegisterURL(const char* applicationId)
     if (status != noErr) {
         fprintf(stderr, "Error in LSRegisterURL: %d\n", (int)status);
     }
+
+    if (cfURL) CFRelease(cfURL);
 }
 
 void Discord_Register(const char* applicationId, const char* command)
